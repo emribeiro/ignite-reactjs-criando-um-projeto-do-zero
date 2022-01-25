@@ -1,7 +1,10 @@
 import { GetStaticProps } from 'next';
-
-import { Head } from 'next/document';
+import Link from 'next/link';
+import { FiCalendar, FiUser } from 'react-icons/fi';
+import { useState } from 'react';
 import Prismic from '@prismicio/client';
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -26,25 +29,65 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default function Home({ postsPagination }: HomeProps) {
+export default function Home({ postsPagination }: HomeProps): JSX.Element {
+  const [posts, setPosts] = useState<Post[]>(postsPagination.results);
+  const [nextPage, setNextPage] = useState<string | null>(
+    postsPagination.next_page
+  );
+
+  async function handleNextPage(): Promise<void> {
+    const response = await fetch(nextPage);
+    const data = await response.json();
+    setNextPage(data.next_page);
+
+    const nextPosts = data.results.map(post => {
+      return {
+        uid: post.uid,
+        first_publication_date: format(
+          new Date(post.first_publication_date),
+          'dd MMM yyyy',
+          {
+            locale: ptBR,
+          }
+        ),
+        data: {
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+        },
+      };
+    });
+    setPosts(prevState => [...prevState, ...nextPosts]);
+  }
   return (
     <>
-      <div>
-        <div>
-          <h3>spacetraveling</h3>
-        </div>
-        {postsPagination.results.map(post => (
-          <>
+      <div className={styles.postsContainer}>
+        <header>
+          <img src="/images/logo.svg" alt="logo" />
+        </header>
+        {posts.map(post => (
+          <div className={styles.postContainer}>
             <h1>{post.data.title}</h1>
             <p>{post.data.subtitle}</p>
             <div>
-              <time>{post.first_publication_date}</time>
-              <span>{post.data.author}</span>
+              <time>
+                <FiCalendar />
+                {post.first_publication_date}
+              </time>
+              <span>
+                <FiUser />
+                {post.data.author}
+              </span>
             </div>
-          </>
+          </div>
         ))}
+        <footer>
+          {nextPage && (
+            <button type="button" onClick={handleNextPage}>
+              Carregar mais posts
+            </button>
+          )}
+        </footer>
       </div>
     </>
   );
@@ -70,13 +113,13 @@ export const getStaticProps: GetStaticProps = async () => {
     results: postsResponse.results.map(post => {
       return {
         uid: post.uid,
-        first_publication_date: new Date(
-          post.first_publication_date
-        ).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-        }),
+        first_publication_date: format(
+          new Date(post.first_publication_date),
+          'dd MMM yyyy',
+          {
+            locale: ptBR,
+          }
+        ),
         data: {
           title: post.data.title,
           subtitle: post.data.subtitle,

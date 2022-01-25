@@ -1,1 +1,51 @@
-// TODO
+
+.postsContainer{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 0
+}
+
+.postsContainer header{
+    margin: 2rem 0;
+    font-size: 24px;
+    color: var(--heading);
+}
+.postsContainer footer{
+    margin-top: 2rem;
+}
+
+.postsContainer footer button{
+    color: var(--highlight);
+    font-weight: 400;
+    background: var(--background);
+    border: 0;
+}
+.postContainer + .postContainer{
+    margin-top: 2rem;
+}
+
+.postContainer h1{
+    margin-bottom: 1rem;
+    color: var(--heading);
+}
+
+.postContainer p{
+    margin-bottom: 1.2rem;
+}
+
+.postContainer div{
+    color: var(--info);
+    font-size: 14px;
+}
+
+.postContainer div time{
+    margin-right: 1rem;
+}
+
+.postContainer div time svg{
+    margin-right: 0.4rem;
+}
+
+.postContainer div span svg{
+    margin-right: 0.4rem;
+}
