@@ -1,1 +1,41 @@
-// TODO
+.headerContainer{
+    margin-bottom: 1rem;
+}
+
+.postHeading{
+    margin: 2rem 0;
+}
+.postHeading h2{
+    color: var(--heading);
+}
+
+.postSubtitle{
+    display: flex;
+    color: var(--info);
+    font-size: 0.8rem;
+    margin: 0.4rem 0;
+}
+
+.postSubtitle div {
+    margin: 0 0.5rem;
+}
+
+.postSubtitle div svg{
+    margin-right: 0.5rem;
+}
+
+.postBody{
+    margin: 1rem 0;
+}
+
+.postBody div{
+    margin-bottom: 1rem;
+}
+
+.postBody div h2{
+    margin-bottom: 0.5rem;
+}
+
+.postBody div p{
+    color: var(--body);
+}

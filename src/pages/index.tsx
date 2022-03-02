@@ -6,12 +6,14 @@ import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../services/prismic';
+import Header from '../components/Header';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 
 interface Post {
   uid?: string;
+  slug: string;
   first_publication_date: string | null;
   data: {
     title: string;
@@ -35,6 +37,8 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
     postsPagination.next_page
   );
 
+  console.log(nextPage);
+
   async function handleNextPage(): Promise<void> {
     const response = await fetch(nextPage);
     const data = await response.json();
@@ -50,6 +54,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             locale: ptBR,
           }
         ),
+        slug: post.uid,
         data: {
           title: post.data.title,
           subtitle: post.data.subtitle,
@@ -62,12 +67,14 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   return (
     <>
       <div className={styles.postsContainer}>
-        <header>
-          <img src="/images/logo.svg" alt="logo" />
-        </header>
+        <Header />
         {posts.map(post => (
           <div className={styles.postContainer}>
-            <h1>{post.data.title}</h1>
+            <Link key={post.slug} href={`/post/${post.slug}`}>
+              <a>
+                <h1>{post.data.title}</h1>
+              </a>
+            </Link>
             <p>{post.data.subtitle}</p>
             <div>
               <time>
@@ -103,6 +110,7 @@ export const getStaticProps: GetStaticProps = async () => {
         'blog_post.subtitle',
         'blog_post.author',
         'blog_post.content',
+        'blog_post.slug',
       ],
       pageSize: 2,
     }
@@ -113,6 +121,7 @@ export const getStaticProps: GetStaticProps = async () => {
     results: postsResponse.results.map(post => {
       return {
         uid: post.uid,
+        slug: post.slugs[0],
         first_publication_date: format(
           new Date(post.first_publication_date),
           'dd MMM yyyy',
