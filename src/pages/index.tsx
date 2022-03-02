@@ -13,7 +13,6 @@ import styles from './home.module.scss';
 
 interface Post {
   uid?: string;
-  slug: string;
   first_publication_date: string | null;
   data: {
     title: string;
@@ -64,13 +63,19 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
     });
     setPosts(prevState => [...prevState, ...nextPosts]);
   }
+
+  function formatDate(date): string {
+    return format(new Date(date), 'dd MMM yyyy', {
+      locale: ptBR,
+    });
+  }
   return (
     <>
+      <Header />
       <div className={styles.postsContainer}>
-        <Header />
         {posts.map(post => (
           <div className={styles.postContainer}>
-            <Link key={post.slug} href={`/post/${post.slug}`}>
+            <Link key={post.uid} href={`/post/${post.uid}`}>
               <a>
                 <h1>{post.data.title}</h1>
               </a>
@@ -79,7 +84,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             <div>
               <time>
                 <FiCalendar />
-                {post.first_publication_date}
+                {formatDate(post.first_publication_date)}
               </time>
               <span>
                 <FiUser />
@@ -121,14 +126,7 @@ export const getStaticProps: GetStaticProps = async () => {
     results: postsResponse.results.map(post => {
       return {
         uid: post.uid,
-        slug: post.slugs[0],
-        first_publication_date: format(
-          new Date(post.first_publication_date),
-          'dd MMM yyyy',
-          {
-            locale: ptBR,
-          }
-        ),
+        first_publication_date: post.first_publication_date,
         data: {
           title: post.data.title,
           subtitle: post.data.subtitle,
